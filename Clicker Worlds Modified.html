@@ -1,0 +1,2947 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Clicker Worlds</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@300;400;600;700;900&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="manifest" id="manifestLink">
+<link rel="apple-touch-icon" href="#">
+<style>
+/* ════════════ ROOT VARS ════════════ */
+:root {
+  --bg: #04040f;
+  --bg2: #080818;
+  --bg3: #0c0c22;
+  --panel: #07071a;
+  --card: #0d0d28;
+  --gold: #e8b84b;
+  --gold2: #ffd060;
+  --text: #ddd8ff;
+  --text2: #7870a8;
+  --text3: #4a4470;
+  --border: rgba(100,80,200,.18);
+  --border2: rgba(100,80,200,.08);
+  --wc: #7b3fe4;
+  --wc2: #a855f7;
+  --success: #00e5a0;
+  --danger: #ff4060;
+  --glow: rgba(100,80,200,.35);
+  --r: 14px;
+  --r2: 10px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+body {
+  font-family: 'Cairo', 'Tajawal', sans-serif;
+  color: var(--text);
+  cursor: default;
+  direction: rtl;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(120,80,255,.4);
+  border-radius: 3px;
+}
+
+/* ════════════ CANVAS ════════════ */
+#bgCanvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ════════════ LAYOUT ════════════ */
+#app {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-rows: 65px 1fr;
+  grid-template-columns: 280px 1fr 320px;
+  height: 100vh;
+  gap: 0;
+}
+
+/* ════════════ TOPBAR ════════════ */
+#topbar {
+  grid-column: 1/-1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  background: linear-gradient(90deg, rgba(4,4,15,1), rgba(8,4,28,.98), rgba(4,4,15,1));
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  z-index: 10;
+  box-shadow: 0 2px 30px rgba(80,40,200,.2);
+}
+
+.logo-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 6px;
+}
+
+.logo-icon {
+  font-size: 24px;
+  filter: drop-shadow(0 0 10px var(--wc));
+}
+
+.logo-text {
+  font-family: 'Amiri', serif;
+  font-size: 14px;
+  font-weight: 700;
+  background: linear-gradient(90deg, var(--gold), var(--wc2), var(--gold2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  white-space: nowrap;
+  letter-spacing: .05em;
+}
+
+.res-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(10,10,30,.85);
+  border: 1px solid var(--border);
+  border-radius: 30px;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  backdrop-filter: blur(12px);
+  transition: all .3s;
+}
+
+.res-pill .rp-icon {
+  font-size: 16px;
+}
+
+.res-pill .rp-val {
+  color: var(--gold);
+  font-family: 'Amiri', serif;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.res-pill .rp-rate {
+  color: var(--text3);
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.tb-spacer {
+  flex: 1;
+}
+
+.tb-btn {
+  background: rgba(10,8,28,.7);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text2);
+  font-family: 'Cairo', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 10px;
+  cursor: pointer;
+  transition: all .2s;
+  white-space: nowrap;
+}
+
+.tb-btn:hover {
+  border-color: var(--wc);
+  color: var(--text);
+  box-shadow: 0 0 12px var(--glow);
+  transform: translateY(-1px);
+}
+
+.tb-btn:active {
+  transform: translateY(0);
+}
+
+.tb-btn.prestige-btn {
+  background: linear-gradient(135deg, rgba(232,184,75,.3), rgba(123,63,228,.3));
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.tb-btn.prestige-btn:hover {
+  box-shadow: 0 0 20px rgba(232,184,75,.4);
+}
+
+.trophy-btn {
+  background: rgba(10,8,28,.7);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text2);
+  font-size: 18px;
+  padding: 6px 10px;
+  cursor: pointer;
+  position: relative;
+}
+
+.trophy-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: var(--gold);
+  color: #000;
+  font-size: 10px;
+  font-weight: bold;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-menu-btn {
+  display: none;
+  background: rgba(10,8,28,.7);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text2);
+  font-size: 18px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+/* ════════════ LEFT – WORLDS ════════════ */
+#worldPanel {
+  grid-row: 2;
+  grid-column: 1;
+  overflow-y: auto;
+  padding: 16px 12px;
+  background: var(--panel);
+  border-left: 1px solid var(--border2);
+  min-height: 0;
+}
+
+.wp-title {
+  font-family: 'Amiri', serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text3);
+  letter-spacing: .15em;
+  padding: 0 6px 12px;
+  text-align: center;
+}
+
+.wcard {
+  position: relative;
+  border-radius: var(--r2);
+  margin-bottom: 8px;
+  padding: 14px 16px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all .25s cubic-bezier(.4,0,.2,1);
+  overflow: hidden;
+  background: var(--card);
+}
+
+.wcard::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 20% 50%, color-mix(in srgb, var(--wc) 20%, transparent), transparent 70%);
+  opacity: 0;
+  transition: .3s;
+}
+
+.wcard:hover:not(.wlocked)::before,
+.wcard.wactive::before {
+  opacity: 1;
+}
+
+.wcard.wactive {
+  border-color: color-mix(in srgb, var(--wc) 60%, transparent);
+  box-shadow: 0 0 20px rgba(123,63,228,.3);
+}
+
+.wcard.wactive::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 25%;
+  bottom: 25%;
+  width: 4px;
+  border-radius: 2px;
+  background: var(--wc);
+  box-shadow: 0 0 10px var(--wc);
+}
+
+.wcard.wcompleted::after {
+  background: var(--gold);
+  box-shadow: 0 0 10px var(--gold);
+}
+
+.wcard-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.wcard-emoji {
+  font-size: 24px;
+  flex-shrink: 0;
+  transition: .3s;
+}
+
+.wcard.wactive .wcard-emoji {
+  filter: drop-shadow(0 0 8px var(--wc));
+  transform: scale(1.1);
+}
+
+.wcard-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.wcard-name {
+  font-family: 'Amiri', serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--wc);
+  display: block;
+  text-shadow: 0 0 12px color-mix(in srgb, var(--wc) 40%, transparent);
+}
+
+.wcard-res {
+  font-size: 11px;
+  color: var(--text3);
+  margin-top: 2px;
+  direction: rtl;
+}
+
+.wcard-prog {
+  height: 3px;
+  background: rgba(255,255,255,.08);
+  border-radius: 2px;
+  margin-top: 10px;
+  overflow: hidden;
+}
+
+.wcard-prog-fill {
+  height: 100%;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--wc), color-mix(in srgb, var(--wc) 70%, white));
+  transition: width .6s ease;
+  box-shadow: 0 0 6px var(--wc);
+}
+
+.wlock-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(4,4,15,.8);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--r2);
+  flex-direction: column;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--text3);
+  font-weight: 600;
+}
+
+.wlock-icon {
+  font-size: 20px;
+  opacity: .7;
+}
+
+.wlock-overlay.wbuyable {
+  background: rgba(4,4,15,.65);
+  backdrop-filter: blur(4px);
+}
+
+.wbuy-btn {
+  padding: 7px 14px;
+  border-radius: 25px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  background: rgba(100,80,200,.18);
+  border: 1px solid rgba(100,80,200,.5);
+  color: var(--text2);
+  transition: .2s;
+  font-family: 'Amiri', serif;
+}
+
+.wbuy-btn.wbuy-ready {
+  background: rgba(0,229,160,.2);
+  border-color: rgba(0,229,160,.6);
+  color: var(--success);
+  animation: pulse-ready 1.5s ease-in-out infinite;
+}
+
+.wbuy-btn:hover {
+  transform: scale(1.05);
+}
+
+@keyframes pulse-ready {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(0,229,160,.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(0,229,160,0);
+  }
+}
+
+/* ════════════ CENTER – MAIN PANEL ════════════ */
+#mainPanel {
+  grid-row: 2;
+  grid-column: 2;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+#worldBanner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 20px 10px;
+  background: linear-gradient(180deg, rgba(0,0,0,.6) 0%, transparent 100%);
+  border-bottom: 1px solid var(--border2);
+}
+
+.wb-emoji {
+  font-size: 48px;
+  filter: drop-shadow(0 0 20px var(--wc));
+  transition: all .5s;
+  animation: float-emoji 4s ease-in-out infinite;
+}
+
+@keyframes float-emoji {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(5deg);
+  }
+}
+
+.wb-text h2 {
+  font-family: 'Amiri', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--wc);
+  text-shadow: 0 0 15px color-mix(in srgb, var(--wc) 50%, transparent);
+  margin-bottom: 4px;
+}
+
+.wb-text p {
+  font-size: 12px;
+  color: var(--text3);
+  font-weight: 500;
+}
+
+.prestige-info {
+  margin-right: auto;
+  display: flex;
+  gap: 10px;
+}
+
+.prestige-badge {
+  background: linear-gradient(135deg, var(--gold), var(--wc2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-family: 'Amiri', serif;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+#clickSection {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  position: relative;
+}
+
+/* Dynamic click button shapes */
+#clickBtn {
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  border: 4px solid var(--wc);
+  background: radial-gradient(circle at 30% 30%, color-mix(in srgb, var(--wc) 25%, transparent), var(--card));
+  box-shadow: 0 0 40px var(--glow), inset 0 0 30px rgba(0,0,0,.5);
+  cursor: pointer;
+  transition: all .15s cubic-bezier(.4,0,.2,1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 70px;
+  position: relative;
+  overflow: hidden;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* World-specific shapes */
+#clickBtn.shape-circle {
+  border-radius: 50%;
+}
+
+#clickBtn.shape-square {
+  border-radius: 12px;
+}
+
+#clickBtn.shape-hexagon {
+  clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+  border-radius: 0;
+}
+
+#clickBtn.shape-diamond {
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  border-radius: 0;
+}
+
+#clickBtn.shape-star {
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  border-radius: 0;
+}
+
+#clickBtn.shape-pentagon {
+  clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+  border-radius: 0;
+}
+
+#clickBtn.shape-cross {
+  clip-path: polygon(30% 0%, 70% 0%, 70% 30%, 100% 30%, 100% 70%, 70% 70%, 70% 100%, 30% 100%, 30% 70%, 0% 70%, 0% 30%, 30% 30%);
+  border-radius: 0;
+}
+
+#clickBtn.shape-heart {
+  clip-path: path('M50 88.9L16.7 55.6C7.2 46.1 7.2 30.9 16.7 21.4s24.7-9.5 34.2 0l3.2 3.2 3.2-3.2c9.5-9.5 24.7-9.5 34.2 0s9.5 24.7 0 34.2L50 88.9z');
+  border-radius: 0;
+}
+
+#clickBtn::before {
+  content: '';
+  position: absolute;
+  inset: -50%;
+  background: conic-gradient(from 0deg, transparent, var(--wc), transparent);
+  animation: rotate 3s linear infinite;
+  opacity: 0;
+  transition: opacity .3s;
+}
+
+#clickBtn:hover::before {
+  opacity: .3;
+}
+
+@keyframes rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+#clickBtn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 60px var(--glow), inset 0 0 40px rgba(0,0,0,.6);
+}
+
+#clickBtn:active {
+  transform: scale(.95);
+}
+
+.click-counter {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.click-counter-label {
+  font-size: 13px;
+  color: var(--text3);
+  margin-bottom: 4px;
+}
+
+.click-counter-val {
+  font-family: 'Amiri', serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--gold);
+  text-shadow: 0 0 20px rgba(232,184,75,.5);
+}
+
+/* Floating numbers */
+.float-num {
+  position: absolute;
+  font-family: 'Amiri', serif;
+  font-weight: 700;
+  font-size: 24px;
+  color: var(--gold);
+  text-shadow: 0 0 10px rgba(232,184,75,.8);
+  pointer-events: none;
+  animation: float-up 1.5s ease-out forwards;
+  z-index: 100;
+}
+
+@keyframes float-up {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-100px) scale(1.2);
+  }
+}
+
+/* ════════════ RIGHT – UPGRADES ════════════ */
+#upgradePanel {
+  grid-row: 2;
+  grid-column: 3;
+  overflow-y: auto;
+  padding: 16px 14px;
+  background: var(--panel);
+  border-right: 1px solid var(--border2);
+  min-height: 0;
+}
+
+.up-title {
+  font-family: 'Amiri', serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text3);
+  letter-spacing: .15em;
+  padding: 0 6px 12px;
+  text-align: center;
+}
+
+.upgrade-slot {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  padding: 12px;
+  margin-bottom: 10px;
+  transition: all .25s;
+}
+
+.upgrade-slot:hover {
+  border-color: var(--wc);
+  box-shadow: 0 0 15px var(--glow);
+}
+
+.us-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.us-icon {
+  font-size: 24px;
+  filter: drop-shadow(0 0 6px var(--wc));
+}
+
+.us-info {
+  flex: 1;
+}
+
+.us-name {
+  font-family: 'Amiri', serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+
+.us-level {
+  font-size: 10px;
+  color: var(--text3);
+}
+
+.us-buy {
+  padding: 8px 16px;
+  border-radius: 8px;
+  background: rgba(100,80,200,.15);
+  border: 1px solid rgba(100,80,200,.4);
+  color: var(--text2);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .2s;
+  font-family: 'Cairo', sans-serif;
+  white-space: nowrap;
+  width: 100%;
+  text-align: center;
+}
+
+.us-buy:hover:not(.us-disabled) {
+  background: rgba(100,80,200,.25);
+  border-color: var(--wc);
+  color: var(--text);
+  transform: translateY(-1px);
+}
+
+.us-buy.us-disabled {
+  opacity: .4;
+  cursor: not-allowed;
+}
+
+.us-buy.us-maxed {
+  background: rgba(0,229,160,.15);
+  border-color: rgba(0,229,160,.5);
+  color: var(--success);
+  cursor: default;
+}
+
+.us-desc {
+  font-size: 11px;
+  color: var(--text3);
+  line-height: 1.5;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border2);
+}
+
+/* ════════════ MODAL (generic) ════════════ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.85);
+  backdrop-filter: blur(8px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s;
+}
+
+.modal-overlay.show {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.modal-box {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 24px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 50px rgba(0,0,0,.5);
+  transform: scale(.9);
+  transition: transform .3s;
+  position: relative;
+}
+
+.modal-overlay.show .modal-box {
+  transform: scale(1);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.modal-title {
+  font-family: 'Amiri', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--wc);
+  text-shadow: 0 0 15px color-mix(in srgb, var(--wc) 40%, transparent);
+  margin: 0;
+}
+
+.modal-close-x {
+  background: none;
+  border: none;
+  color: var(--text2);
+  font-size: 28px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  transition: color .2s;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.modal-close-x:hover {
+  color: var(--danger);
+  background: rgba(255,64,96,.1);
+}
+
+.modal-content {
+  margin-bottom: 20px;
+}
+
+.setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border2);
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.setting-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.toggle-btn {
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .2s;
+  border: 1px solid;
+  background: transparent;
+}
+
+.toggle-btn.on {
+  background: rgba(0,229,160,.2);
+  border-color: rgba(0,229,160,.6);
+  color: var(--success);
+}
+
+.toggle-btn.off {
+  background: rgba(255,64,96,.15);
+  border-color: rgba(255,64,96,.5);
+  color: var(--danger);
+}
+
+.vol-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 200px;
+}
+
+.vol-slider {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255,255,255,.1);
+  outline: none;
+  -webkit-appearance: none;
+}
+
+.vol-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--wc);
+  cursor: pointer;
+  box-shadow: 0 0 8px var(--glow);
+}
+
+.vol-val {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text2);
+  min-width: 40px;
+  text-align: center;
+}
+
+/* Mobile modals */
+.mobile-modal .worlds-list,
+.mobile-modal .upgrades-list {
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+/* ════════════ TROPHIES MODAL ════════════ */
+.trophy-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  padding: 10px;
+}
+
+.trophy-slot {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: all .2s;
+}
+
+.trophy-slot:hover {
+  border-color: var(--gold);
+  box-shadow: 0 0 10px rgba(232,184,75,.3);
+}
+
+.trophy-slot.locked {
+  opacity: 0.3;
+  filter: grayscale(100%);
+}
+
+.trophy-slot.unlocked {
+  border-color: var(--gold);
+  box-shadow: 0 0 15px rgba(232,184,75,.4);
+}
+
+.trophy-icon {
+  font-size: 28px;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.trophy-name {
+  font-size: 9px;
+  color: var(--text3);
+  line-height: 1.2;
+}
+
+.trophy-slot.unlocked .trophy-name {
+  color: var(--gold);
+}
+
+/* ════════════ PRESTIGE MODAL ════════════ */
+.prestige-modal-content {
+  text-align: center;
+}
+
+.prestige-rewards {
+  background: var(--card);
+  border: 1px solid var(--gold);
+  border-radius: var(--r2);
+  padding: 20px;
+  margin: 20px 0;
+}
+
+.prestige-reward {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border2);
+}
+
+.prestige-reward:last-child {
+  border-bottom: none;
+}
+
+.prestige-reward-icon {
+  font-size: 24px;
+}
+
+.prestige-reward-text {
+  flex: 1;
+  text-align: right;
+  padding: 0 10px;
+}
+
+.prestige-reward-value {
+  color: var(--gold);
+  font-weight: bold;
+}
+
+.prestige-btn {
+  background: linear-gradient(135deg, var(--gold), var(--wc2));
+  border: none;
+  border-radius: 12px;
+  padding: 15px 30px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #000;
+  cursor: pointer;
+  transition: all .3s;
+  width: 100%;
+}
+
+.prestige-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 30px rgba(232,184,75,.5);
+}
+
+/* ════════════ TOAST ════════════ */
+#toastContainer {
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.toast {
+  background: rgba(10,10,30,.95);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 20px;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: 0 4px 20px rgba(0,0,0,.5);
+  backdrop-filter: blur(10px);
+  opacity: 0;
+  transform: translateY(-20px);
+  animation: toast-in .3s forwards, toast-out .3s 2.7s forwards;
+  text-align: center;
+}
+
+.toast.trophy-toast {
+  border-color: var(--gold);
+  background: rgba(232,184,75,.15);
+}
+
+@keyframes toast-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes toast-out {
+  to {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+}
+
+/* ════════════ RESPONSIVE (mobile) ════════════ */
+@media (max-width: 1024px) {
+  #app {
+    grid-template-columns: 1fr;
+    grid-template-rows: 65px 1fr;
+  }
+
+  #worldPanel,
+  #upgradePanel {
+    display: none;
+  }
+
+  #mainPanel {
+    grid-column: 1;
+  }
+
+  .mobile-menu-btn {
+    display: inline-block;
+  }
+
+  #clickBtn {
+    width: 220px;
+    height: 220px;
+    font-size: 60px;
+  }
+
+  .wb-emoji {
+    font-size: 40px;
+  }
+
+  .wb-text h2 {
+    font-size: 18px;
+  }
+
+  .res-pill {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+
+  .prestige-info {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  #clickBtn {
+    width: 180px;
+    height: 180px;
+    font-size: 50px;
+  }
+
+  .logo-text {
+    display: none;
+  }
+
+  .tb-btn {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+
+  .trophy-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+</style>
+</head>
+<body>
+<canvas id="bgCanvas"></canvas>
+
+<div id="app">
+  <!-- TOPBAR -->
+  <div id="topbar">
+    <div class="logo-wrap">
+      <div class="logo-icon">🌍</div>
+      <div class="logo-text" data-i18n="gameTitle">عوالم النقر</div>
+    </div>
+
+    <div class="res-pill" id="currencyPill">
+      <div class="rp-icon" id="currIcon">🌱</div>
+      <div class="rp-val" id="currVal">0</div>
+      <div class="rp-rate" id="currRate">+0/ث</div>
+    </div>
+
+    <div class="tb-spacer"></div>
+
+    <!-- Prestige Info -->
+    <div class="prestige-info" id="prestigeInfo" style="display: none;">
+      <div class="prestige-badge">⭐ <span id="prestigeLevel">0</span></div>
+    </div>
+
+    <!-- Mobile menu buttons -->
+    <button class="mobile-menu-btn" onclick="openMobileWorlds()">🌐</button>
+    <button class="mobile-menu-btn" onclick="openMobileUpgrades()">🔧</button>
+
+    <!-- Trophies Button -->
+    <button class="trophy-btn" onclick="openTrophies()">🏆
+      <span class="trophy-badge" id="trophyCount">0</span>
+    </button>
+
+    <button class="tb-btn" onclick="openSettings()">⚙️</button>
+    <button class="tb-btn" onclick="saveGame()">💾</button>
+    <button class="tb-btn prestige-btn" id="prestigeBtn" onclick="openPrestige()" style="display: none;">⭐</button>
+  </div>
+
+  <!-- LEFT PANEL: WORLDS (desktop) -->
+  <div id="worldPanel">
+    <div class="wp-title" data-i18n="worldsTitle">● العوالم ●</div>
+    <div id="worldsList"></div>
+  </div>
+
+  <!-- CENTER PANEL: CLICKER -->
+  <div id="mainPanel">
+    <div id="worldBanner">
+      <div class="wb-emoji" id="bannerEmoji">🌱</div>
+      <div class="wb-text">
+        <h2 id="bannerName">الحديقة السماوية</h2>
+        <p id="bannerDesc">ابدأ رحلتك في عالم النباتات الأسطورية</p>
+      </div>
+    </div>
+
+    <div id="clickSection">
+      <div id="clickBtn" class="shape-circle" onclick="handleClick()" ontouchstart="handleClick()">
+        <span id="clickEmoji">🌱</span>
+      </div>
+      <div class="click-counter">
+        <div class="click-counter-label" data-i18n="clickPower">قوة الضغطة</div>
+        <div class="click-counter-val" id="clickPower">+1</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL: UPGRADES (desktop) -->
+  <div id="upgradePanel">
+    <div class="up-title" data-i18n="upgradesTitle">● التطويرات ●</div>
+    <div id="upgradesList"></div>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2 class="modal-title">⚙️ <span data-i18n="settings">الإعدادات</span></h2>
+      <button class="modal-close-x" onclick="closeSettings()">✖</button>
+    </div>
+    <div class="modal-content">
+      <div class="setting-row">
+        <div class="setting-label">🎵 <span data-i18n="music">الموسيقى</span></div>
+        <button class="toggle-btn on" id="togMusic" onclick="toggleSetting('music')" data-i18n="on">تشغيل</button>
+      </div>
+      <div class="setting-row">
+        <div class="setting-label">🔊 <span data-i18n="sfx">المؤثرات الصوتية</span></div>
+        <button class="toggle-btn on" id="togSfx" onclick="toggleSetting('sfx')" data-i18n="on">تشغيل</button>
+      </div>
+      <div class="setting-row">
+        <div class="setting-label">✨ <span data-i18n="particles">الجزيئات</span></div>
+        <button class="toggle-btn on" id="togParticles" onclick="toggleSetting('particles')" data-i18n="on">تشغيل</button>
+      </div>
+      <div class="setting-row">
+        <div class="setting-label">🔉 <span data-i18n="volume">مستوى الصوت</span></div>
+        <div class="vol-control">
+          <input type="range" class="vol-slider" id="volSlider" min="0" max="100" value="40" oninput="updateVolume()">
+          <div class="vol-val" id="volVal">40%</div>
+        </div>
+      </div>
+      <div class="setting-row">
+        <div class="setting-label">🌐 <span data-i18n="language">اللغة</span></div>
+        <select id="langSelect" onchange="changeLanguage(this.value)" style="background:var(--card); color:var(--text); border:1px solid var(--border); border-radius:8px; padding:6px;">
+          <option value="ar">العربية</option>
+          <option value="en">English</option>
+          <option value="fr">Français</option>
+          <option value="es">Español</option>
+          <option value="de">Deutsch</option>
+          <option value="zh">中文</option>
+          <option value="ru">Русский</option>
+          <option value="ja">日本語</option>
+          <option value="ko">한국어</option>
+          <option value="pt">Português</option>
+          <option value="hi">हिन्दी</option>
+          <option value="tr">Türkçe</option>
+          <option value="it">Italiano</option>
+          <option value="nl">Nederlands</option>
+          <option value="pl">Polski</option>
+          <option value="th">ไทย</option>
+          <option value="vi">Tiếng Việt</option>
+          <option value="id">Bahasa Indonesia</option>
+          <option value="ms">Bahasa Melayu</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TROPHIES MODAL -->
+<div class="modal-overlay" id="trophiesModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2 class="modal-title">🏆 <span data-i18n="trophies">الكؤوس</span></h2>
+      <button class="modal-close-x" onclick="closeTrophies()">✖</button>
+    </div>
+    <div class="modal-content">
+      <div class="trophy-grid" id="trophyGrid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PRESTIGE MODAL -->
+<div class="modal-overlay" id="prestigeModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2 class="modal-title">⭐ <span data-i18n="prestige">الصعود</span></h2>
+      <button class="modal-close-x" onclick="closePrestige()">✖</button>
+    </div>
+    <div class="modal-content prestige-modal-content">
+      <p data-i18n="prestigeDesc">لقد أكملت كل العوالم! هل تريد الصعود للحصول على مكافآت إضافية؟</p>
+      <div class="prestige-rewards">
+        <div class="prestige-reward">
+          <span class="prestige-reward-icon">👆</span>
+          <span class="prestige-reward-text" data-i18n="clickBonus">قوة النقر</span>
+          <span class="prestige-reward-value">+50%</span>
+        </div>
+        <div class="prestige-reward">
+          <span class="prestige-reward-icon">⚡</span>
+          <span class="prestige-reward-text" data-i18n="autoBonus">الأنترنت</span>
+          <span class="prestige-reward-value">+10%</span>
+        </div>
+        <div class="prestige-reward">
+          <span class="prestige-reward-icon">🏆</span>
+          <span class="prestige-reward-text" data-i18n="trophiesBonus">كؤوس</span>
+          <span class="prestige-reward-value">+50</span>
+        </div>
+      </div>
+      <button class="prestige-btn" onclick="doPrestige()" data-i18n="ascend">صعود</button>
+    </div>
+  </div>
+</div>
+
+<!-- MOBILE WORLDS MODAL -->
+<div class="modal-overlay" id="mobileWorldsModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2 class="modal-title">🌐 <span data-i18n="worldsTitle">العوالم</span></h2>
+      <button class="modal-close-x" onclick="closeMobileWorlds()">✖</button>
+    </div>
+    <div class="worlds-list" id="mobileWorldsList"></div>
+  </div>
+</div>
+
+<!-- MOBILE UPGRADES MODAL -->
+<div class="modal-overlay" id="mobileUpgradesModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2 class="modal-title">🔧 <span data-i18n="upgradesTitle">التطويرات</span></h2>
+      <button class="modal-close-x" onclick="closeMobileUpgrades()">✖</button>
+    </div>
+    <div class="upgrades-list" id="mobileUpgradesList"></div>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div id="toastContainer"></div>
+
+<script>
+// ════════════════════════════════════════════════════════════════════
+// I18N SYSTEM
+// ════════════════════════════════════════════════════════════════════
+const LANG = {
+  ar: {
+    gameTitle: 'عوالم النقر',
+    worldsTitle: '● العوالم ●',
+    upgradesTitle: '● التطويرات ●',
+    clickPower: 'قوة الضغطة',
+    settings: 'الإعدادات',
+    music: 'الموسيقى',
+    sfx: 'المؤثرات الصوتية',
+    particles: 'الجزيئات',
+    volume: 'مستوى الصوت',
+    language: 'اللغة',
+    on: 'تشغيل',
+    off: 'إيقاف',
+    close: 'إغلاق',
+    save: 'حفظ',
+    reset: 'إعادة',
+    buy: 'شراء',
+    maxed: 'مكتمل',
+    locked: 'مقفل',
+    unlock: 'فتح',
+    currency: 'العملة',
+    perSecond: 'في الثانية',
+    trophies: 'الكؤوس',
+    prestige: 'الصعود',
+    prestigeDesc: 'لقد أكملت كل العوالم! هل تريد الصعود للحصول على مكافآت إضافية؟',
+    clickBonus: 'قوة النقر',
+    autoBonus: 'الأنترنت',
+    trophiesBonus: 'كؤوس',
+    ascend: 'صعود',
+    completed: 'مكتمل'
+  },
+  en: {
+    gameTitle: 'Clicker Worlds',
+    worldsTitle: '● WORLDS ●',
+    upgradesTitle: '● UPGRADES ●',
+    clickPower: 'Click Power',
+    settings: 'Settings',
+    music: 'Music',
+    sfx: 'Sound FX',
+    particles: 'Particles',
+    volume: 'Volume',
+    language: 'Language',
+    on: 'On',
+    off: 'Off',
+    close: 'Close',
+    save: 'Save',
+    reset: 'Reset',
+    buy: 'Buy',
+    maxed: 'Maxed',
+    locked: 'Locked',
+    unlock: 'Unlock',
+    currency: 'Currency',
+    perSecond: 'per second',
+    trophies: 'Trophies',
+    prestige: 'Prestige',
+    prestigeDesc: 'You have completed all worlds! Ascend to get extra rewards?',
+    clickBonus: 'Click Power',
+    autoBonus: 'Auto Rate',
+    trophiesBonus: 'Trophies',
+    ascend: 'Ascend',
+    completed: 'Completed'
+  }
+};
+
+let currentLang = 'ar';
+
+function setLanguage(lang) {
+  if (!LANG[lang]) lang = 'ar';
+  currentLang = lang;
+  document.documentElement.lang = lang;
+  document.documentElement.dir = (lang === 'ar') ? 'rtl' : 'ltr';
+
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (LANG[lang][key]) {
+      el.textContent = LANG[lang][key];
+    }
+  });
+
+  document.querySelectorAll('.toggle-btn').forEach(btn => {
+    const isOn = btn.classList.contains('on');
+    btn.textContent = isOn ? LANG[lang].on : LANG[lang].off;
+  });
+
+  renderWorldsList();
+  renderUpgrades();
+  renderTrophies();
+
+  const world = WORLDS[G.currentWorld];
+  if (world) {
+    document.getElementById('bannerName').textContent = currentLang === 'ar' ? world.name : (world.name_en || world.name);
+    document.getElementById('bannerDesc').textContent = currentLang === 'ar' ? world.desc : (world.desc_en || world.desc);
+  }
+}
+
+function changeLanguage(lang) {
+  setLanguage(lang);
+  saveGame();
+}
+
+// ════════════════════════════════════════════════════════════════════
+// WORLD-SPECIFIC UPGRADES & SHAPES
+// ════════════════════════════════════════════════════════════════════
+
+const WORLD_SHAPES = ['circle', 'square', 'hexagon', 'diamond', 'star', 'pentagon', 'cross', 'heart'];
+
+const WORLD_UPGRADES = {
+  0: { // Garden
+    names: ['وردة', 'شجرة', 'أوراق', 'جذور', 'زهرة', 'شجيرة', 'عشب', 'ثمر', 'نسيم', 'روضة'],
+    names_en: ['Rose', 'Tree', 'Leaves', 'Roots', 'Flower', 'Bush', 'Grass', 'Fruit', 'Breeze', 'Garden'],
+    icons: ['🌹', '🌳', '🍃', '🌿', '🌸', '🌿', '🌱', '🍎', '🍃', '🏵️']
+  },
+  1: { // Clockwork
+    names: ['ترس', 'آلة', 'معدل', 'محرك', 'بكرة', 'عمود', 'صمام', 'مضخة', 'عجلة', 'آلية'],
+    names_en: ['Gear', 'Machine', 'Regulator', 'Engine', 'Pulley', 'Shaft', 'Valve', 'Pump', 'Wheel', 'Mechanism'],
+    icons: ['⚙️', '🔧', '⚖️', '🔩', '⛓️', '🔩', '🔌', '⚙️', '🔩', '⚙️']
+  },
+  2: { // Volcano
+    names: ['حمم', 'صخر', 'شرر', 'رماد', 'بركان', 'lava', 'نار', 'غاز', 'بخار', 'انفجار'],
+    names_en: ['Lava', 'Rock', 'Ember', 'Ash', 'Volcano', 'Magma', 'Fire', 'Gas', 'Steam', 'Eruption'],
+    icons: ['🌋', '🪨', '🔥', '🌫️', '🌋', '🔥', '🔥', '💨', '♨️', '💥']
+  },
+  3: { // Ocean
+    names: ['محارة', 'سمكة', 'شعب', 'مرجان', 'عشب', 'قوقعة', 'لؤلؤ', 'دلفين', 'حوت', 'أمواج'],
+    names_en: ['Shell', 'Fish', 'Reef', 'Coral', 'Seaweed', 'Conch', 'Pearl', 'Dolphin', 'Whale', 'Waves'],
+    icons: ['🐚', '🐟', '🪸', '🪸', '🌿', '🐚', '🔮', '🐬', '🐋', '🌊']
+  },
+  4: { // Sky
+    names: ['سحابة', 'ريش', 'جناح', 'صقر', 'نسيم', 'قمر', 'نجم', 'شمس', 'قوس', 'عاصفة'],
+    names_en: ['Cloud', 'Feather', 'Wing', 'Eagle', 'Breeze', 'Moon', 'Star', 'Sun', 'Rainbow', 'Storm'],
+    icons: ['☁️', '🪶', '🦅', '🦅', '🍃', '🌙', '⭐', '☀️', '🌈', '⛈️']
+  },
+  5: { // Neon
+    names: ['ضوء', 'شاشة', 'رقاقة', 'بيانات', 'طاقة', 'ليزر', 'روبوت', 'سيبر', 'هولوجرام', 'ميتافيرس'],
+    names_en: ['Light', 'Screen', 'Chip', 'Data', 'Energy', 'Laser', 'Robot', 'Cyber', 'Hologram', 'Metaverse'],
+    icons: ['💡', '🖥️', '💾', '📊', '⚡', '🔦', '🤖', '💻', '🔮', '🌐']
+  },
+  6: { // Library
+    names: ['كتاب', 'مخطوطة', 'حكمة', 'قلم', 'علم', 'فلسفة', 'تاريخ', 'أسطورة', 'ملحمة', 'عرفة'],
+    names_en: ['Book', 'Manuscript', 'Wisdom', 'Pen', 'Knowledge', 'Philosophy', 'History', 'Legend', 'Epic', 'Enlightenment'],
+    icons: ['📖', '📜', '📚', '✒️', '🎓', '🤔', '📕', '📖', '📗', '🎓']
+  },
+  7: { // Galaxy
+    names: ['نجمة', 'كووكب', 'مجرة', 'كون', 'زحل', 'المريخ', 'القمر', 'نيزك', 'ثقب', 'كوازار'],
+    names_en: ['Star', 'Planet', 'Galaxy', 'Universe', 'Saturn', 'Mars', 'Moon', 'Meteor', 'Black Hole', 'Quasar'],
+    icons: ['⭐', '🪐', '🌌', '🌌', '🪐', '🔴', '🌙', '☄️', '🕳️', '💫']
+  }
+};
+
+const TROPHIES = [
+  { id: 0, icon: '👆', name: 'الضغطة الأولى', name_en: 'First Click', desc: 'انقر مرة واحدة' },
+  { id: 1, icon: '🌱', name: 'بذرة الحياة', name_en: 'Seed of Life', desc: 'جمع 100 نبتة' },
+  { id: 2, icon: '🌳', name: 'حارس الغابة', name_en: 'Forest Guardian', desc: 'جمع 1000 نبتة' },
+  { id: 3, icon: '⚙️', name: 'عجلة التقدم', name_en: 'Wheel of Progress', desc: 'اشترِ ترقية واحدة' },
+  { id: 4, icon: '🔧', name: 'مهندس مبتدئ', name_en: 'Novice Engineer', desc: 'اشترِ 10 ترقيات' },
+  { id: 5, icon: '🌋', name: 'صعود الجبال', name_en: 'Mountain Climber', desc: 'افتح العالم الثالث' },
+  { id: 6, icon: '🌊', name: 'سيد المحيطات', name_en: 'Ocean Master', desc: 'افتح العالم الرابع' },
+  { id: 7, icon: '☁️', name: 'طائر السماء', name_en: 'Sky Bird', desc: 'افتح العالم الخامس' },
+  { id: 8, icon: '🌃', name: 'مواطن المستقبل', name_en: 'Future Citizen', desc: 'افتح العالم السادس' },
+  { id: 9, icon: '📚', name: 'عالم الحكمة', name_en: 'Scholar', desc: 'افتح العالم السابع' },
+  { id: 10, icon: '🌌', name: 'مستكشف المجرة', name_en: 'Galaxy Explorer', desc: 'افتح العالم الثامن' },
+  { id: 11, icon: '⭐', name: 'نجمة الصعود', name_en: 'Ascension Star', desc: 'الصعود مرة واحدة' },
+  { id: 12, icon: '👑', name: 'ملك العوالم', name_en: 'King of Worlds', desc: 'الصعود 5 مرات' },
+  { id: 13, icon: '💎', name: 'كنز ثمين', name_en: 'Precious Treasure', desc: 'جمع 1 مليون عملة' },
+  { id: 14, icon: '💰', name: 'مليونير', name_en: 'Millionaire', desc: 'جمع 1 مليون في عالم واحد' },
+  { id: 15, icon: '💵', name: 'ملياردير', name_en: 'Billionaire', desc: 'جمع 1 مليار في عالم واحد' },
+  { id: 16, icon: '🏦', name: 'بنك مركزي', name_en: 'Central Bank', desc: 'اجمالي 10 مليارات' },
+  { id: 17, icon: '🚀', name: 'انطلاق سريع', name_en: 'Quick Start', desc: 'افتح العالم الثاني خلال دقيقة' },
+  { id: 18, icon: '⚡', name: 'سرعة البرق', name_en: 'Lightning Speed', desc: 'افتح العالم الرابع خلال 5 دقائق' },
+  { id: 19, icon: '🎯', name: 'هدف دقيق', name_en: 'Precision Target', desc: 'انقر 1000 مرة' },
+  { id: 20, icon: '🖱️', name: 'فأرة ذهبية', name_en: 'Golden Mouse', desc: 'انقر 10000 مرة' },
+  { id: 21, icon: '💪', name: 'قوة خارقة', name_en: 'Super Strength', desc: 'قوة نقر 1000+' },
+  { id: 22, icon: '🔄', name: 'دورة لا نهائية', name_en: 'Infinite Cycle', desc: 'دخل تلقائي 1000+' },
+  { id: 23, icon: '🎖️', name: 'ميدالي اول', name_en: 'First Medal', desc: 'الفوز بكأس واحد' },
+  { id: 24, icon: '🏅', name: 'محترف الكؤوس', name_en: 'Cup Pro', desc: 'الفوز بـ 10 كؤوس' },
+  { id: 25, icon: '🥇', name: 'بطل الألعاب', name_en: 'Games Champion', desc: 'الفوز بـ 25 كأس' },
+  { id: 26, icon: '🎵', name: 'موسيقى الطبيعة', name_en: 'Nature Music', desc: 'الاستماع لجميع الأصوات' },
+  { id: 27, icon: '🔊', name: 'صوت العوالم', name_en: 'Voice of Worlds', desc: 'قم بتفعيل جميع الأصوات' },
+  { id: 28, icon: '🌍', name: 'مواطن العالم', name_en: 'World Citizen', desc: 'قم بزيارة جميع العوالم' },
+  { id: 29, icon: '🎮', name: 'لاعب محترف', name_en: 'Pro Gamer', desc: 'اللعب لمدة ساعة' },
+  { id: 30, icon: '⏰', name: 'مدمن العمل', name_en: 'Work Addict', desc: 'اللعب لمدة 10 ساعات' },
+  { id: 31, icon: '🌅', name: 'فجر جديد', name_en: 'New Dawn', desc: 'اللعب لمدة 24 ساعة' },
+  { id: 32, icon: '💤', name: 'القليل من الراحة', name_en: 'Short Rest', desc: 'احصل على 0 تريليونات' },
+  { id: 33, icon: '🎯', name: 'انقر سريع', name_en: 'Fast Click', desc: '10 نقرات في ثانية' },
+  { id: 34, icon: '🔥', name: 'نار مشتعلة', name_en: 'On Fire', desc: 'قوة نقر 100+' },
+  { id: 35, icon: '💥', name: 'انفجار', name_en: 'Explosion', desc: 'دخل تلقائي 100+' },
+  { id: 36, icon: '🌈', name: 'قوس قزح', name_en: 'Rainbow', desc: 'جمع عملات جميع الألوان' },
+  { id: 37, icon: '🔮', name: 'كريستال سحري', name_en: 'Magic Crystal', desc: 'اشترِ ترقية واحدة من كل نوع' },
+  { id: 38, icon: '🎪', name: 'سيد التحول', name_en: 'Master of Shapes', desc: 'جميع أشكال النقر' },
+  { id: 39, icon: '🧙', name: 'ساحر', name_en: 'Wizard', desc: 'الصعود 10 مرات' },
+  { id: 40, icon: '🦸', name: 'بطل خارق', name_en: 'Superhero', desc: 'الصعود 25 مرة' },
+  { id: 41, icon: '👣', name: 'خطوة صغيرة', name_en: 'Small Step', desc: 'خطواتك الأولى' },
+  { id: 42, icon: '🏃', name: 'الجري', name_en: 'Running', desc: 'جمع 10000 عملة' },
+  { id: 43, icon: '🎢', name: 'رحلة مثيرة', name_en: 'Exciting Journey', desc: 'جمع 100000 عملة' },
+  { id: 44, icon: '🎡', name: 'عجلة الحظ', name_en: 'Wheel of Luck', desc: 'جمع 1000000 عملة' },
+  { id: 45, icon: '🎠', name: 'الخيل الدوارة', name_en: 'Carousel', desc: 'جمع 10000000 عملة' },
+  { id: 46, icon: '🗽', name: 'تمثال الحرية', name_en: 'Statue of Liberty', desc: 'جمع 100000000 عملة' },
+  { id: 47, icon: '🏰', name: 'قلعة', name_en: 'Castle', desc: 'جمع 1000000000 عملة' },
+  { id: 48, icon: '🗿', name: 'تمثال عملاق', name_en: 'Giant Statue', desc: 'جمع 10000000000 عملة' },
+  { id: 49, icon: '🏆', name: 'البطل الأعظم', name_en: 'Greatest Hero', desc: 'افوز بجميع الكؤوس' }
+];
+
+const WORLDS = [
+  {
+    id: 0,
+    name: 'الحديقة السماوية',
+    name_en: 'Celestial Garden',
+    emoji: '🌱',
+    currencyIcon: '🌱',
+    currencyName: 'نباتات',
+    currencyName_en: 'Plants',
+    color: '#4ade80',
+    desc: 'ابدأ رحلتك في عالم النباتات الأسطورية',
+    desc_en: 'Start your journey in the world of legendary plants',
+    unlockCost: 0,
+    unlocked: true,
+    soundType: 'garden'
+  },
+  {
+    id: 1,
+    name: 'عالم الساعات',
+    name_en: 'Clockwork World',
+    emoji: '⚙️',
+    currencyIcon: '⚙️',
+    currencyName: 'تروس',
+    currencyName_en: 'Gears',
+    color: '#94a3b8',
+    desc: 'عالم الآلات والتروس الدقيقة',
+    desc_en: 'World of machines and precision gears',
+    unlockCost: 2500000,
+    unlocked: false,
+    soundType: 'clockwork'
+  },
+  {
+    id: 2,
+    name: 'البركان الناري',
+    name_en: 'Fire Volcano',
+    emoji: '🌋',
+    currencyIcon: '🔥',
+    currencyName: 'صخور نارية',
+    currencyName_en: 'Igneous rocks',
+    color: '#ef4444',
+    desc: 'قوة الحمم والنار الأبدية',
+    desc_en: 'Power of lava and eternal fire',
+    unlockCost: 7500000,
+    unlocked: false,
+    soundType: 'volcano'
+  },
+  {
+    id: 3,
+    name: 'أعماق المحيط',
+    name_en: 'Ocean Depths',
+    emoji: '🌊',
+    currencyIcon: '🐚',
+    currencyName: 'محار',
+    currencyName_en: 'Shells',
+    color: '#06b6d4',
+    desc: 'كنوز البحار العميقة',
+    desc_en: 'Treasures of the deep seas',
+    unlockCost: 22500000,
+    unlocked: false,
+    soundType: 'ocean'
+  },
+  {
+    id: 4,
+    name: 'السماء العليا',
+    name_en: 'High Sky',
+    emoji: '☁️',
+    currencyIcon: '🪶',
+    currencyName: 'ريش',
+    currencyName_en: 'Feathers',
+    color: '#8b5cf6',
+    desc: 'عالم الغيوم والرياح',
+    desc_en: 'World of clouds and wind',
+    unlockCost: 67500000,
+    unlocked: false,
+    soundType: 'sky'
+  },
+  {
+    id: 5,
+    name: 'المدينة النيون',
+    name_en: 'Neon City',
+    emoji: '🌃',
+    currencyIcon: '⚡',
+    currencyName: 'طاقة',
+    currencyName_en: 'Energy',
+    color: '#ec4899',
+    desc: 'مستقبل الكهرباء والأضواء',
+    desc_en: 'Future of electricity and lights',
+    unlockCost: 202500000,
+    unlocked: false,
+    soundType: 'neon'
+  },
+  {
+    id: 6,
+    name: 'المكتبة الأبدية',
+    name_en: 'Eternal Library',
+    emoji: '📚',
+    currencyIcon: '📜',
+    currencyName: 'صفحات',
+    currencyName_en: 'Pages',
+    color: '#f59e0b',
+    desc: 'حكمة العصور في صفحات',
+    desc_en: 'Wisdom of ages in pages',
+    unlockCost: 607500000,
+    unlocked: false,
+    soundType: 'library'
+  },
+  {
+    id: 7,
+    name: 'المجرة البعيدة',
+    name_en: 'Far Galaxy',
+    emoji: '🌌',
+    currencyIcon: '⭐',
+    currencyName: 'نجوم',
+    currencyName_en: 'Stars',
+    color: '#3b82f6',
+    desc: 'ما وراء الكون المعروف',
+    desc_en: 'Beyond the known universe',
+    unlockCost: 1822500000,
+    unlocked: false,
+    soundType: 'galaxy',
+    isFinal: true
+  }
+];
+
+// Game state
+const G = {
+  currentWorld: 0,
+  currencies: [0, 0, 0, 0, 0, 0, 0, 0],
+  clickPower: [1, 1, 1, 1, 1, 1, 1, 1],
+  autoRate: [0, 0, 0, 0, 0, 0, 0, 0],
+  upgrades: [],
+  settings: {
+    music: true,
+    sfx: true,
+    particles: true,
+    vol: 40
+  },
+  lastTick: Date.now(),
+  isActive: true,
+  prestigeLevel: 0,
+  trophies: [],
+  totalClicks: 0,
+  totalEarned: 0,
+  worldsCompleted: 0
+};
+
+// ════════════════════════════════════════════════════════════════════
+// UPGRADE GENERATION
+// ════════════════════════════════════════════════════════════════════
+// World-specific base prices (each world has different starting costs)
+const worldBasePrices = [50, 75, 100, 150, 250, 400, 600, 1000];
+
+function generateUpgrades() {
+  G.upgrades = [];
+
+  for (let worldId = 0; worldId < 8; worldId++) {
+    for (let slot = 0; slot < 10; slot++) {
+      const slotUpgrades = [];
+
+      for (let level = 0; level < 10; level++) {
+        // Each slot doubles from the previous slot
+        // Each level within a slot also doubles
+        // Formula: basePrice * 2^slot * 2^level = basePrice * 2^(slot + level)
+        const basePrice = worldBasePrices[worldId];
+        const cost = Math.floor(basePrice * Math.pow(2, slot + level));
+
+        let effect, effectValue;
+        if (slot % 2 === 0) {
+          effect = 'click';
+          effectValue = Math.pow(1.5, level + 1);
+        } else {
+          effect = 'auto';
+          effectValue = Math.pow(2, level + 1) * (Math.floor(slot / 2) + 1);
+        }
+
+        slotUpgrades.push({
+          worldId,
+          slot,
+          level,
+          cost,
+          effect,
+          effectValue,
+          owned: false
+        });
+      }
+
+      G.upgrades.push(slotUpgrades);
+    }
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════
+// AUDIO SYSTEM
+// ════════════════════════════════════════════════════════════════════
+const AUDIO = (() => {
+  let ctx;
+  let masterGain;
+  let currentNodes = [];
+  let ambientNodes = [];
+  let isInitialized = false;
+
+  function init() {
+    if (!ctx) {
+      ctx = new (window.AudioContext || window.webkitAudioContext)();
+      masterGain = ctx.createGain();
+      masterGain.connect(ctx.destination);
+      updateVolume();
+      isInitialized = true;
+    }
+    if (ctx.state === 'suspended') {
+      ctx.resume();
+    }
+  }
+
+  function stopAll() {
+    ambientNodes.forEach(node => {
+      try {
+        if (node.stop) node.stop();
+        if (node.disconnect) node.disconnect();
+      } catch (e) {}
+    });
+    ambientNodes = [];
+    currentNodes.forEach(node => {
+      try { node.stop(); } catch (e) {}
+    });
+    currentNodes = [];
+  }
+
+  function updateVolume() {
+    if (masterGain) {
+      const vol = G.settings.vol / 100;
+      masterGain.gain.linearRampToValueAtTime(vol, ctx.currentTime + 0.1);
+    }
+  }
+
+  function createNoiseBuffer() {
+    const bufferSize = ctx.sampleRate * 2;
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const output = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      output[i] = Math.random() * 2 - 1;
+    }
+    return buffer;
+  }
+
+  function playGardenAmbience() {
+    if (!G.settings.music) return;
+    init();
+    stopAll();
+
+    const windNoise = ctx.createBufferSource();
+    windNoise.buffer = createNoiseBuffer();
+    windNoise.loop = true;
+
+    const windFilter = ctx.createBiquadFilter();
+    windFilter.type = 'lowpass';
+    windFilter.frequency.value = 400;
+    windFilter.Q.value = 1;
+
+    const windGain = ctx.createGain();
+    windGain.gain.value = 0.03;
+
+    windNoise.connect(windFilter);
+    windFilter.connect(windGain);
+    windGain.connect(masterGain);
+    windNoise.start();
+    ambientNodes.push(windNoise);
+
+    function chirp() {
+      if (!G.settings.music || ambientNodes.length === 0) return;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const baseFreq = 2000 + Math.random() * 2000;
+      osc.frequency.setValueAtTime(baseFreq, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.5, ctx.currentTime + 0.05);
+      osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.8, ctx.currentTime + 0.1);
+      gain.gain.setValueAtTime(0, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.02, ctx.currentTime + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+      osc.connect(gain);
+      gain.connect(masterGain);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.2);
+      setTimeout(chirp, 2000 + Math.random() * 5000);
+    }
+    setTimeout(chirp, 1000);
+  }
+
+  function playClockworkAmbience() {
+    if (!G.settings.music) return;
+    init();
+    stopAll();
+
+    const osc1 = ctx.createOscillator();
+    const osc2 = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc1.type = 'sine';
+    osc1.frequency.value = 60;
+    osc2.type = 'sine';
+    osc2.frequency.value = 120;
+    gain.gain.value = 0.015;
+    osc1.connect(gain);
+    osc2.connect(gain);
+    gain.connect(masterGain);
+    osc1.start();
+    osc2.start();
+    ambientNodes.push(osc1, osc2);
+
+    function tick() {
+      if (!G.settings.music || ambientNodes.length === 0) return;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = 800;
+      gain.gain.setValueAtTime(0.04, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+      osc.connect(gain);
+      gain.connect(masterGain);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.1);
+      setTimeout(tick, 1000);
+    }
+    setTimeout(tick, 500);
+  }
+
+  function playVolcanoAmbience() {
+    if (!G.settings.music) return;
+    init();
+    stopAll();
+
+    const noise = ctx.createBufferSource();
+    noise.buffer = createNoiseBuffer();
+    noise.loop = true;
+
+    const lowFilter = ctx.createBiquadFilter();
+    lowFilter.type = 'lowpass';
+    lowFilter.frequency.value = 150;
+    lowFilter.Q.value = 2;
+
+    const rumbleGain = ctx.createGain();
+    rumbleGain.gain.value = 0.06;
+
+    noise.connect(lowFilter);
+    lowFilter.connect(rumbleGain);
+    rumbleGain.connect(masterGain);
+    noise.start();
+    ambientNodes.push(noise);
+  }
+
+  function playOceanAmbience() {
+    if (!G.settings.music) return;
+    init();
+    stopAll();
+
+    const noise = ctx.createBufferSource();
+    noise.buffer = createNoiseBuffer();
+    noise.loop = true;
+
+    const waveFilter = ctx.createBiquadFilter();
+    waveFilter.type = 'lowpass';
+    waveFilter.frequency.value = 600;
+
+    const lfo = ctx.createOscillator();
+    const lfoGain = ctx.createGain();
+    lfo.frequency.value = 0.1;
+    lfoGain.gain.value = 0.03;
+
+    lfo.connect(lfoGain);
+    lfoGain.connect(waveFilter.frequency);
+
+    const waveGain = ctx.createGain();
+    waveGain.gain.value = 0.04;
+
+    noise.connect(waveFilter);
+    waveFilter.connect(waveGain);
+    waveGain.connect(masterGain);
+
+    noise.start();
+    lfo.start();
+    ambientNodes.push(noise, lfo);
+  }
+
+  function playSkyAmbience() {
+    if (!G.settings.music) return;
+    init();
+    stopAll();
+
+    const noise = ctx.createBufferSource();
+    noise.buffer = createNoiseBuffer();
+    noise.loop = true;
+
+    const windFilter = ctx.createBiquadFilter();
+    windFilter.type = 'bandpass';
+    windFilter.frequency.value = 500;
+    windFilter.Q.value = 0.5;
+
+    const lfo = ctx.createOscillator();
+    const lfoGain = ctx.createGain();
+    lfo.frequency.value = 0.2;
+    lfoGain.gain.value = 0.02;
+
+    lfo.connect(lfoGain);
+    lfoGain.connect(windFilter.frequency);
+
+    const windGain = ctx.createGain();
+    windGain.gain.value = 0.025;
+
+    noise.connect(windFilter);
+    windFilter.connect(windGain);
+    windGain.connect(masterGain);
+
+    noise.start();
+    lfo.start();
+    ambientNodes.push(noise, lfo);
+  }
+
+  function playNeonAmbience() {
+    if (!G.settings.music) return;
+    init();
+    stopAll();
+
+    const osc1 = ctx.createOscillator();
+    const osc2 = ctx.createOscillator();
+    const osc3 = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc1.type = 'sine';
+    osc1.frequency.value = 50;
+    osc2.type = 'sine';
+    osc2.frequency.value = 100;
+    osc3.type = 'sine';
+    osc3.frequency.value = 150;
+
+    gain.gain.value = 0.012;
+
+    osc1.connect(gain);
+    osc2.connect(gain);
+    osc3.connect(gain);
+    gain.connect(masterGain);
+
+    osc1.start();
+    osc2.start();
+    osc3.start();
+    ambientNodes.push(osc1, osc2, osc3);
+  }
+
+  function playLibraryAmbience() {
+    if (!G.settings.music) return;
+    init();
+    stopAll();
+
+    const noise = ctx.createBufferSource();
+    noise.buffer = createNoiseBuffer();
+    noise.loop = true;
+
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 300;
+
+    const fireGain = ctx.createGain();
+    fireGain.gain.value = 0.02;
+
+    noise.connect(filter);
+    filter.connect(fireGain);
+    fireGain.connect(masterGain);
+    noise.start();
+    ambientNodes.push(noise);
+  }
+
+  function playGalaxyAmbience() {
+    if (!G.settings.music) return;
+    init();
+    stopAll();
+
+    const osc1 = ctx.createOscillator();
+    const osc2 = ctx.createOscillator();
+    const osc3 = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc1.type = 'sine';
+    osc1.frequency.value = 40;
+    osc2.type = 'sine';
+    osc2.frequency.value = 60;
+    osc3.type = 'sine';
+    osc3.frequency.value = 80;
+
+    gain.gain.value = 0.015;
+
+    osc1.connect(gain);
+    osc2.connect(gain);
+    osc3.connect(gain);
+    gain.connect(masterGain);
+
+    osc1.start();
+    osc2.start();
+    osc3.start();
+    ambientNodes.push(osc1, osc2, osc3);
+  }
+
+  function playAmbient(worldId) {
+    const world = WORLDS[worldId];
+    if (!world) return;
+
+    switch(world.soundType) {
+      case 'garden': playGardenAmbience(); break;
+      case 'clockwork': playClockworkAmbience(); break;
+      case 'volcano': playVolcanoAmbience(); break;
+      case 'ocean': playOceanAmbience(); break;
+      case 'sky': playSkyAmbience(); break;
+      case 'neon': playNeonAmbience(); break;
+      case 'library': playLibraryAmbience(); break;
+      case 'galaxy': playGalaxyAmbience(); break;
+      default: playGardenAmbience();
+    }
+  }
+
+  function playClick(worldId) {
+    if (!G.settings.sfx) return;
+    init();
+
+    const world = WORLDS[worldId];
+    if (!world) return;
+
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    let freq, duration;
+    switch(world.soundType) {
+      case 'garden':
+        freq = 300 + Math.random() * 200;
+        duration = 0.12;
+        gain.gain.setValueAtTime(0.06, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+        break;
+      case 'clockwork':
+        freq = 600 + Math.random() * 200;
+        duration = 0.08;
+        gain.gain.setValueAtTime(0.08, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+        break;
+      case 'volcano':
+        freq = 150 + Math.random() * 100;
+        duration = 0.15;
+        gain.gain.setValueAtTime(0.1, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+        break;
+      case 'ocean':
+        freq = 800 + Math.random() * 400;
+        duration = 0.2;
+        gain.gain.setValueAtTime(0.05, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+        break;
+      case 'sky':
+        freq = 400 + Math.random() * 200;
+        duration = 0.15;
+        gain.gain.setValueAtTime(0.04, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+        break;
+      case 'neon':
+        freq = 1200 + Math.random() * 800;
+        duration = 0.1;
+        gain.gain.setValueAtTime(0.04, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+        break;
+      case 'library':
+        freq = 250 + Math.random() * 150;
+        duration = 0.1;
+        gain.gain.setValueAtTime(0.07, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+        break;
+      case 'galaxy':
+        freq = 1000 + Math.random() * 500;
+        duration = 0.3;
+        gain.gain.setValueAtTime(0.03, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+        break;
+      default:
+        freq = 440 + worldId * 50;
+        duration = 0.1;
+        gain.gain.setValueAtTime(0.08, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+    }
+
+    osc.frequency.value = freq;
+    osc.connect(gain);
+    gain.connect(masterGain);
+    osc.start();
+    osc.stop(ctx.currentTime + duration);
+  }
+
+  function playBuy() {
+    if (!G.settings.sfx) return;
+    init();
+    const notes = [523, 659, 784];
+    notes.forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.05, ctx.currentTime + i * 0.08);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.08 + 0.3);
+      osc.connect(gain);
+      gain.connect(masterGain);
+      osc.start(ctx.currentTime + i * 0.08);
+      osc.stop(ctx.currentTime + i * 0.08 + 0.35);
+    });
+  }
+
+  function playTrophy() {
+    if (!G.settings.sfx) return;
+    init();
+    const notes = [784, 988, 1175];
+    notes.forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.08, ctx.currentTime + i * 0.1);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.1 + 0.4);
+      osc.connect(gain);
+      gain.connect(masterGain);
+      osc.start(ctx.currentTime + i * 0.1);
+      osc.stop(ctx.currentTime + i * 0.1 + 0.5);
+    });
+  }
+
+  return {
+    playAmbient,
+    playClick,
+    playBuy,
+    playTrophy,
+    stopAll,
+    updateVolume,
+    init
+  };
+})();
+
+// ════════════════════════════════════════════════════════════════════
+// GAME LOGIC
+// ════════════════════════════════════════════════════════════════════
+function handleClick() {
+  const worldId = G.currentWorld;
+
+  // Apply prestige bonus
+  const clickMultiplier = 1 + (G.prestigeLevel * 0.5);
+
+  // Check if all click upgrades are completed in this world
+  let allClickUpgradesCompleted = true;
+  for (let slot = 0; slot < 10; slot += 2) {
+    const upgrades = G.upgrades[worldId * 10 + slot];
+    if (upgrades && !upgrades[9].owned) {
+      allClickUpgradesCompleted = false;
+      break;
+    }
+  }
+
+  // Calculate base click power with ×3 multiplier
+  let baseClickPower = G.clickPower[worldId] * 3;
+
+  // Add world-based bonus if all click upgrades are completed (×3 multiplier already applied)
+  if (allClickUpgradesCompleted) {
+    // World 1 = 2500, World 2 = 5000, etc.
+    baseClickPower += (worldId + 1) * 2500;
+  }
+
+  let clickValue = baseClickPower * clickMultiplier;
+  clickValue = Math.min(clickValue, 5000);
+
+  G.currencies[worldId] += clickValue;
+  G.totalClicks++;
+  G.totalEarned += clickValue;
+
+  createFloatingNumber(clickValue);
+  AUDIO.playClick(worldId);
+
+  const btn = document.getElementById('clickBtn');
+  btn.style.transform = 'scale(0.95)';
+  setTimeout(() => btn.style.transform = 'scale(1)', 100);
+
+  updateUI();
+  checkTrophies();
+}
+
+function createFloatingNumber(value) {
+  const btn = document.getElementById('clickBtn');
+  const rect = btn.getBoundingClientRect();
+  const num = document.createElement('div');
+  num.className = 'float-num';
+  num.textContent = '+' + formatNumber(value);
+  num.style.left = (rect.left + rect.width/2 - 30 + Math.random()*60) + 'px';
+  num.style.top = (rect.top + rect.height/2) + 'px';
+  document.body.appendChild(num);
+  setTimeout(() => num.remove(), 1500);
+}
+
+function buyUpgrade(worldId, slotIndex, level) {
+  const upgrades = G.upgrades[worldId * 10 + slotIndex];
+  const upgrade = upgrades[level];
+
+  if (upgrade.owned) return;
+  if (G.currencies[worldId] < upgrade.cost) {
+    toast('❌ ' + (currentLang === 'ar' ? 'ليس لديك ما يكفي' : 'Not enough currency'));
+    return;
+  }
+
+  if (level > 0 && !upgrades[level - 1].owned) {
+    toast('⚠️ ' + (currentLang === 'ar' ? 'يجب شراء التطوير السابق' : 'Buy previous upgrade first'));
+    return;
+  }
+
+  G.currencies[worldId] -= upgrade.cost;
+  upgrade.owned = true;
+
+  if (upgrade.effect === 'click') {
+    // Apply ×3 multiplier to click upgrades
+    G.clickPower[worldId] += upgrade.effectValue * 3;
+  } else {
+    // Apply ×3 multiplier to auto rate upgrades
+    G.autoRate[worldId] += upgrade.effectValue * 3;
+  }
+
+  AUDIO.playBuy();
+  toast('✨ ' + (currentLang === 'ar' ? 'تم الشراء!' : 'Purchased!'));
+  updateUI();
+  renderUpgrades();
+}
+
+function switchWorld(worldId) {
+  if (!WORLDS[worldId].unlocked) return;
+
+  G.currentWorld = worldId;
+  const world = WORLDS[worldId];
+
+  document.getElementById('bannerEmoji').textContent = world.emoji;
+  document.getElementById('bannerName').textContent = currentLang === 'ar' ? world.name : (world.name_en || world.name);
+  document.getElementById('bannerDesc').textContent = currentLang === 'ar' ? world.desc : (world.desc_en || world.desc);
+  document.getElementById('clickEmoji').textContent = world.emoji;
+  document.getElementById('currIcon').textContent = world.currencyIcon;
+
+  document.documentElement.style.setProperty('--wc', world.color);
+
+  // Change button shape
+  const clickBtn = document.getElementById('clickBtn');
+  clickBtn.className = 'shape-' + WORLD_SHAPES[worldId];
+
+  AUDIO.playAmbient(worldId);
+
+  renderWorldsList();
+  renderUpgrades();
+  updateUI();
+}
+
+function unlockWorld(worldId) {
+  const world = WORLDS[worldId];
+  if (world.unlocked) return;
+
+  const prevWorldId = worldId - 1;
+
+  // Check if all upgrades in previous world are completed
+  let allPrevUpgradesCompleted = true;
+  for (let slot = 0; slot < 10; slot++) {
+    const upgrades = G.upgrades[prevWorldId * 10 + slot];
+    if (upgrades && !upgrades[9].owned) {
+      allPrevUpgradesCompleted = false;
+      break;
+    }
+  }
+
+  if (!allPrevUpgradesCompleted) {
+    toast('⚠️ ' + (currentLang === 'ar' ? 'يجب إكمال جميع تطويرات العالم السابق' : 'Complete all upgrades in previous world first'));
+    return;
+  }
+
+  if (G.currencies[prevWorldId] < world.unlockCost) {
+    const prevWorld = WORLDS[prevWorldId];
+    const currencyName = currentLang === 'ar' ? prevWorld.currencyName : (prevWorld.currencyName_en || prevWorld.currencyName);
+    toast('❌ ' + (currentLang === 'ar' ? 'تحتاج ' + formatNumber(world.unlockCost) + ' ' + currencyName : 'Need ' + formatNumber(world.unlockCost) + ' ' + currencyName));
+    return;
+  }
+
+  G.currencies[prevWorldId] -= world.unlockCost;
+  world.unlocked = true;
+  G.worldsCompleted++;
+
+  toast('🎉 ' + (currentLang === 'ar' ? 'تم فتح ' + world.name : 'Unlocked ' + (world.name_en || world.name)));
+  AUDIO.playBuy();
+
+  checkPrestigeButton();
+  renderWorldsList();
+  updateUI();
+}
+
+function tick() {
+  if (!G.isActive) {
+    G.lastTick = Date.now();
+    requestAnimationFrame(tick);
+    return;
+  }
+
+  const now = Date.now();
+  const delta = (now - G.lastTick) / 1000;
+  G.lastTick = now;
+
+  const worldId = G.currentWorld;
+
+  // Apply prestige bonus for auto rate
+  const autoMultiplier = 1 + (G.prestigeLevel * 0.1);
+  if (G.autoRate[worldId] > 0) {
+    const earned = G.autoRate[worldId] * autoMultiplier * delta;
+    G.currencies[worldId] += earned;
+    G.totalEarned += earned;
+  }
+
+  updateUI();
+  requestAnimationFrame(tick);
+}
+
+// ════════════════════════════════════════════════════════════════════
+// TROPHY SYSTEM
+// ════════════════════════════════════════════════════════════════════
+function checkTrophies() {
+  const newTrophies = [];
+
+  // First click
+  if (G.totalClicks >= 1 && !G.trophies.includes(0)) {
+    G.trophies.push(0);
+    newTrophies.push(0);
+  }
+
+  // 1000 clicks
+  if (G.totalClicks >= 1000 && !G.trophies.includes(19)) {
+    G.trophies.push(19);
+    newTrophies.push(19);
+  }
+
+  // 10000 clicks
+  if (G.totalClicks >= 10000 && !G.trophies.includes(20)) {
+    G.trophies.push(20);
+    newTrophies.push(20);
+  }
+
+  // World unlocks
+  if (WORLDS[2].unlocked && !G.trophies.includes(5)) { G.trophies.push(5); newTrophies.push(5); }
+  if (WORLDS[3].unlocked && !G.trophies.includes(6)) { G.trophies.push(6); newTrophies.push(6); }
+  if (WORLDS[4].unlocked && !G.trophies.includes(7)) { G.trophies.push(7); newTrophies.push(7); }
+  if (WORLDS[5].unlocked && !G.trophies.includes(8)) { G.trophies.push(8); newTrophies.push(8); }
+  if (WORLDS[6].unlocked && !G.trophies.includes(9)) { G.trophies.push(9); newTrophies.push(9); }
+  if (WORLDS[7].unlocked && !G.trophies.includes(10)) { G.trophies.push(10); newTrophies.push(10); }
+
+  // Currency milestones
+  const maxCurrency = Math.max(...G.currencies);
+  if (maxCurrency >= 1e6 && !G.trophies.includes(14)) { G.trophies.push(14); newTrophies.push(14); }
+  if (maxCurrency >= 1e9 && !G.trophies.includes(15)) { G.trophies.push(15); newTrophies.push(15); }
+
+  // Prestige
+  if (G.prestigeLevel >= 1 && !G.trophies.includes(11)) { G.trophies.push(11); newTrophies.push(11); }
+  if (G.prestigeLevel >= 5 && !G.trophies.includes(12)) { G.trophies.push(12); newTrophies.push(12); }
+  if (G.prestigeLevel >= 10 && !G.trophies.includes(39)) { G.trophies.push(39); newTrophies.push(39); }
+
+  // Check all worlds completed
+  const allUnlocked = WORLDS.every(w => w.unlocked);
+  if (allUnlocked && !G.trophies.includes(49)) {
+    G.trophies.push(49);
+    newTrophies.push(49);
+  }
+
+  // Show trophy notifications
+  newTrophies.forEach(id => {
+    const trophy = TROPHIES[id];
+    const name = currentLang === 'ar' ? trophy.name : trophy.name_en;
+    showTrophyToast(name);
+    AUDIO.playTrophy();
+  });
+
+  updateTrophyCount();
+}
+
+function showTrophyToast(name) {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = 'toast trophy-toast';
+  toast.textContent = '🏆 ' + (currentLang === 'ar' ? 'حصلت على كأس: ' : 'Trophy: ') + name;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+function updateTrophyCount() {
+  document.getElementById('trophyCount').textContent = G.trophies.length;
+}
+
+function openTrophies() {
+  renderTrophies();
+  document.getElementById('trophiesModal').classList.add('show');
+}
+
+function closeTrophies() {
+  document.getElementById('trophiesModal').classList.remove('show');
+}
+
+function renderTrophies() {
+  const container = document.getElementById('trophyGrid');
+  let html = '';
+
+  TROPHIES.forEach(trophy => {
+    const isUnlocked = G.trophies.includes(trophy.id);
+    const name = currentLang === 'ar' ? trophy.name : trophy.name_en;
+
+    html += `
+      <div class="trophy-slot ${isUnlocked ? 'unlocked' : 'locked'}" title="${name}: ${trophy.desc}">
+        <span class="trophy-icon">${trophy.icon}</span>
+        <span class="trophy-name">${name}</span>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+}
+
+// ════════════════════════════════════════════════════════════════════
+// PRESTIGE SYSTEM
+// ════════════════════════════════════════════════════════════════════
+function checkPrestigeButton() {
+  const allUnlocked = WORLDS.every(w => w.unlocked);
+  const prestigeBtn = document.getElementById('prestigeBtn');
+  const prestigeInfo = document.getElementById('prestigeInfo');
+
+  if (allUnlocked) {
+    prestigeBtn.style.display = 'block';
+    prestigeInfo.style.display = 'flex';
+    document.getElementById('prestigeLevel').textContent = G.prestigeLevel;
+  }
+}
+
+function openPrestige() {
+  document.getElementById('prestigeModal').classList.add('show');
+}
+
+function closePrestige() {
+  document.getElementById('prestigeModal').classList.remove('show');
+}
+
+function doPrestige() {
+  // Increase prestige level
+  G.prestigeLevel++;
+
+  // Add 50 trophies
+  const trophyIds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48];
+  trophyIds.forEach(id => {
+    if (!G.trophies.includes(id)) {
+      G.trophies.push(id);
+    }
+  });
+
+  // Reset currencies and upgrades
+  G.currencies = [0, 0, 0, 0, 0, 0, 0, 0];
+  G.clickPower = [1, 1, 1, 1, 1, 1, 1, 1];
+  G.autoRate = [0, 0, 0, 0, 0, 0, 0, 0];
+
+  // Generate new upgrades
+  generateUpgrades();
+
+  // Reset worlds except first
+  WORLDS.forEach((world, i) => {
+    if (i > 0) world.unlocked = false;
+  });
+
+  // Go back to first world
+  G.currentWorld = 0;
+  G.worldsCompleted = 0;
+  G.totalClicks = 0;
+  G.totalEarned = 0;
+
+  closePrestige();
+
+  // Update UI
+  switchWorld(0);
+  renderWorldsList();
+  renderUpgrades();
+  updateUI();
+  checkPrestigeButton();
+  updateTrophyCount();
+
+  toast('⭐ ' + (currentLang === 'ar' ? 'صعدت بنجاح!' : 'Ascended successfully!'));
+  AUDIO.playTrophy();
+}
+
+// ════════════════════════════════════════════════════════════════════
+// UI RENDERING
+// ════════════════════════════════════════════════════════════════════
+function renderWorldsList() {
+  const container = document.getElementById('worldsList');
+  const mobileContainer = document.getElementById('mobileWorldsList');
+  if (!container) return;
+
+  let html = '';
+  WORLDS.forEach((world, idx) => {
+    const activeClass = (idx === G.currentWorld && world.unlocked) ? ' wactive' : '';
+    const lockedClass = world.unlocked ? '' : ' wlocked';
+    const completedClass = world.unlocked && world.isFinal ? ' wcompleted' : '';
+    const worldName = currentLang === 'ar' ? world.name : (world.name_en || world.name);
+    const currencyName = currentLang === 'ar' ? world.currencyName : (world.currencyName_en || world.currencyName);
+
+    let inner = '';
+    if (world.unlocked) {
+      const progress = Math.min(100, (G.currencies[idx] / 1000000) * 100);
+      inner = `
+        <div class="wcard-header">
+          <div class="wcard-emoji">${world.emoji}</div>
+          <div class="wcard-info">
+            <div class="wcard-name">${worldName}</div>
+            <div class="wcard-res">${world.currencyIcon} ${currencyName}</div>
+          </div>
+        </div>
+        <div class="wcard-prog">
+          <div class="wcard-prog-fill" style="width: ${progress}%"></div>
+        </div>
+      `;
+    } else {
+      const prevWorld = idx > 0 ? WORLDS[idx - 1] : null;
+
+      // Check if all upgrades in previous world are completed
+      let allPrevUpgradesCompleted = true;
+      if (idx > 0) {
+        for (let slot = 0; slot < 10; slot++) {
+          const upgrades = G.upgrades[(idx - 1) * 10 + slot];
+          if (upgrades && !upgrades[9].owned) {
+            allPrevUpgradesCompleted = false;
+            break;
+          }
+        }
+      }
+
+      const hasEnoughCurrency = idx > 0 && G.currencies[idx - 1] >= world.unlockCost;
+      const canUnlock = allPrevUpgradesCompleted && hasEnoughCurrency;
+
+      let unlockText = '';
+      if (!allPrevUpgradesCompleted) {
+        unlockText = currentLang === 'ar' ? 'أكمل التطويرات' : 'Complete upgrades';
+      } else {
+        unlockText = (prevWorld ? prevWorld.currencyIcon : '') + ' ' + formatNumber(world.unlockCost);
+      }
+
+      inner = `
+        <div class="wcard-header">
+          <div class="wcard-emoji">${world.emoji}</div>
+          <div class="wcard-info">
+            <div class="wcard-name">${worldName}</div>
+            <div class="wcard-res">🔒 ${LANG[currentLang].locked}</div>
+          </div>
+        </div>
+        <div class="wlock-overlay ${canUnlock ? 'wbuyable' : ''}">
+          <div class="wlock-icon">🔒</div>
+          <div class="wbuy-btn ${canUnlock ? 'wbuy-ready' : ''}" onclick="unlockWorld(${idx})">
+            ${unlockText}
+          </div>
+        </div>
+      `;
+    }
+
+    html += `<div class="wcard${lockedClass}${activeClass}${completedClass}" onclick="${world.unlocked ? `switchWorld(${idx})` : ''}">${inner}</div>`;
+  });
+
+  container.innerHTML = html;
+  if (mobileContainer) mobileContainer.innerHTML = html;
+}
+
+function renderUpgrades() {
+  const container = document.getElementById('upgradesList');
+  const mobileContainer = document.getElementById('mobileUpgradesList');
+  if (!container) return;
+
+  const worldId = G.currentWorld;
+  const world = WORLDS[worldId];
+  const worldUpgradeData = WORLD_UPGRADES[worldId];
+  const currencyName = currentLang === 'ar' ? world.currencyName : (world.currencyName_en || world.currencyName);
+
+  let html = '';
+
+  for (let slot = 0; slot < 10; slot++) {
+    const slotIndex = worldId * 10 + slot;
+    const upgrades = G.upgrades[slotIndex];
+    if (!upgrades) continue;
+
+    let currentLevel = 0;
+    for (let i = 0; i < 10; i++) {
+      if (upgrades[i].owned) currentLevel = i + 1;
+    }
+
+    const nextUpgrade = currentLevel < 10 ? upgrades[currentLevel] : null;
+    const isMaxed = currentLevel >= 10;
+
+    const effectType = slot % 2 === 0 ? '👆' : '⚡';
+    const effectDesc = (slot % 2 === 0)
+      ? (currentLang === 'ar' ? 'يزيد قوة الضغطة' : 'Increases click power')
+      : (currentLang === 'ar' ? 'يولد ' + currencyName + ' تلقائياً' : 'Generates ' + currencyName + ' automatically');
+
+    // Get world-specific upgrade name
+    const upgradeName = currentLang === 'ar' ? worldUpgradeData.names[slot] : worldUpgradeData.names_en[slot];
+    const upgradeIcon = worldUpgradeData.icons[slot];
+
+    let buyButton = '';
+    if (isMaxed) {
+      buyButton = `<button class="us-buy us-maxed">${LANG[currentLang].maxed} ✓</button>`;
+    } else if (nextUpgrade) {
+      const canBuy = G.currencies[worldId] >= nextUpgrade.cost;
+      const disabled = !canBuy ? ' us-disabled' : '';
+      buyButton = `<button class="us-buy${disabled}" onclick="buyUpgrade(${worldId}, ${slot}, ${currentLevel})">${world.currencyIcon} ${formatNumber(nextUpgrade.cost)}</button>`;
+    }
+
+    html += `
+      <div class="upgrade-slot">
+        <div class="us-header">
+          <div class="us-icon">${upgradeIcon}</div>
+          <div class="us-info">
+            <div class="us-name">${upgradeName}</div>
+            <div class="us-level">${LANG[currentLang].buy} ${currentLevel}/10</div>
+          </div>
+        </div>
+        ${buyButton}
+        <div class="us-desc">${effectDesc}</div>
+      </div>
+    `;
+  }
+
+  container.innerHTML = html;
+  if (mobileContainer) mobileContainer.innerHTML = html;
+}
+
+function updateUI() {
+  const worldId = G.currentWorld;
+  const world = WORLDS[worldId];
+
+  // Apply prestige multipliers
+  const clickMultiplier = 1 + (G.prestigeLevel * 0.5);
+  const autoMultiplier = 1 + (G.prestigeLevel * 0.1);
+
+  document.getElementById('currVal').textContent = formatNumber(Math.floor(G.currencies[worldId]));
+
+  // Display auto rate with ×3 multiplier
+  document.getElementById('currRate').textContent = '+' + formatNumber(G.autoRate[worldId] * autoMultiplier) + '/' + (currentLang === 'ar' ? 'ث' : 's');
+
+  // Check if all click upgrades are completed in this world
+  let allClickUpgradesCompleted = true;
+  for (let slot = 0; slot < 10; slot += 2) {
+    const upgrades = G.upgrades[worldId * 10 + slot];
+    if (upgrades && !upgrades[9].owned) {
+      allClickUpgradesCompleted = false;
+      break;
+    }
+  }
+
+  // Calculate display power with ×3 multiplier
+  let displayPower = G.clickPower[worldId] * 3;
+
+  // Add world-based bonus if all click upgrades are completed
+  if (allClickUpgradesCompleted) {
+    displayPower += (worldId + 1) * 2500;
+  }
+
+  displayPower = Math.min(displayPower * clickMultiplier, 5000);
+  document.getElementById('clickPower').textContent = '+' + formatNumber(displayPower);
+}
+
+function formatNumber(num) {
+  if (num >= 1e12) return (num / 1e12).toFixed(2) + 'T';
+  if (num >= 1e9) return (num / 1e9).toFixed(2) + 'B';
+  if (num >= 1e6) return (num / 1e6).toFixed(2) + 'M';
+  if (num >= 1e3) return (num / 1e3).toFixed(2) + 'K';
+  return Math.floor(num).toString();
+}
+
+// ════════════════════════════════════════════════════════════════════
+// SETTINGS & MODALS
+// ════════════════════════════════════════════════════════════════════
+function openSettings() {
+  document.getElementById('settingsModal').classList.add('show');
+  document.getElementById('togMusic').textContent = G.settings.music ? LANG[currentLang].on : LANG[currentLang].off;
+  document.getElementById('togMusic').className = 'toggle-btn ' + (G.settings.music ? 'on' : 'off');
+  document.getElementById('togSfx').textContent = G.settings.sfx ? LANG[currentLang].on : LANG[currentLang].off;
+  document.getElementById('togSfx').className = 'toggle-btn ' + (G.settings.sfx ? 'on' : 'off');
+  document.getElementById('togParticles').textContent = G.settings.particles ? LANG[currentLang].on : LANG[currentLang].off;
+  document.getElementById('togParticles').className = 'toggle-btn ' + (G.settings.particles ? 'on' : 'off');
+  document.getElementById('volSlider').value = G.settings.vol;
+  document.getElementById('volVal').textContent = G.settings.vol + '%';
+  document.getElementById('langSelect').value = currentLang;
+}
+
+function closeSettings() {
+  document.getElementById('settingsModal').classList.remove('show');
+}
+
+function toggleSetting(key) {
+  G.settings[key] = !G.settings[key];
+  const btn = document.getElementById('tog' + key.charAt(0).toUpperCase() + key.slice(1));
+  btn.textContent = G.settings[key] ? LANG[currentLang].on : LANG[currentLang].off;
+  btn.className = 'toggle-btn ' + (G.settings[key] ? 'on' : 'off');
+
+  if (key === 'music') {
+    if (G.settings.music) AUDIO.playAmbient(G.currentWorld);
+    else AUDIO.stopAll();
+  }
+  saveGame();
+}
+
+function updateVolume() {
+  const slider = document.getElementById('volSlider');
+  G.settings.vol = parseInt(slider.value);
+  document.getElementById('volVal').textContent = G.settings.vol + '%';
+  AUDIO.updateVolume();
+  saveGame();
+}
+
+function openMobileWorlds() {
+  renderWorldsList();
+  document.getElementById('mobileWorldsModal').classList.add('show');
+}
+
+function closeMobileWorlds() {
+  document.getElementById('mobileWorldsModal').classList.remove('show');
+}
+
+function openMobileUpgrades() {
+  renderUpgrades();
+  document.getElementById('mobileUpgradesModal').classList.add('show');
+}
+
+function closeMobileUpgrades() {
+  document.getElementById('mobileUpgradesModal').classList.remove('show');
+}
+
+function toast(msg) {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.textContent = msg;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+// ════════════════════════════════════════════════════════════════════
+// SAVE/LOAD
+// ════════════════════════════════════════════════════════════════════
+function saveGame() {
+  const saveData = {
+    currentWorld: G.currentWorld,
+    currencies: G.currencies,
+    clickPower: G.clickPower,
+    autoRate: G.autoRate,
+    upgrades: G.upgrades.map(slot => slot.map(u => u.owned)),
+    worlds: WORLDS.map(w => ({ unlocked: w.unlocked })),
+    settings: G.settings,
+    lang: currentLang,
+    prestigeLevel: G.prestigeLevel,
+    trophies: G.trophies,
+    totalClicks: G.totalClicks,
+    totalEarned: G.totalEarned,
+    worldsCompleted: G.worldsCompleted
+  };
+  localStorage.setItem('clickerWorlds', JSON.stringify(saveData));
+  toast('💾 ' + (currentLang === 'ar' ? 'تم الحفظ' : 'Saved'));
+}
+
+function loadGame() {
+  const saved = localStorage.getItem('clickerWorlds');
+  if (!saved) return;
+  try {
+    const data = JSON.parse(saved);
+    G.currentWorld = data.currentWorld || 0;
+    G.currencies = data.currencies || [0,0,0,0,0,0,0,0];
+    G.clickPower = data.clickPower || [1,1,1,1,1,1,1,1];
+    G.autoRate = data.autoRate || [0,0,0,0,0,0,0,0];
+    if (data.worlds) {
+      data.worlds.forEach((w, i) => { if (WORLDS[i]) WORLDS[i].unlocked = w.unlocked; });
+    }
+    if (data.upgrades) {
+      data.upgrades.forEach((slot, i) => {
+        slot.forEach((owned, j) => {
+          if (G.upgrades[i] && G.upgrades[i][j]) G.upgrades[i][j].owned = owned;
+        });
+      });
+    }
+    if (data.settings) G.settings = { ...G.settings, ...data.settings };
+    if (data.lang) setLanguage(data.lang);
+    G.prestigeLevel = data.prestigeLevel || 0;
+    G.trophies = data.trophies || [];
+    G.totalClicks = data.totalClicks || 0;
+    G.totalEarned = data.totalEarned || 0;
+    G.worldsCompleted = data.worldsCompleted || 0;
+    toast('✅ ' + (currentLang === 'ar' ? 'تم التحميل' : 'Loaded'));
+  } catch (e) { console.error('Load error', e); }
+}
+
+// ════════════════════════════════════════════════════════════════════
+// CANVAS BACKGROUND
+// ════════════════════════════════════════════════════════════════════
+const canvas = document.getElementById('bgCanvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+for (let i = 0; i < 80; i++) {
+  particles.push({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    vx: (Math.random() - 0.5) * 0.3,
+    vy: (Math.random() - 0.5) * 0.3,
+    r: Math.random() * 1.5 + 0.5,
+    a: Math.random() * 0.6 + 0.2
+  });
+}
+
+function drawParticles() {
+  if (!G.settings.particles) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    requestAnimationFrame(drawParticles);
+    return;
+  }
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const color = WORLDS[G.currentWorld].color;
+  particles.forEach(p => {
+    p.x += p.vx;
+    p.y += p.vy;
+    if (p.x < 0) p.x = canvas.width;
+    if (p.x > canvas.width) p.x = 0;
+    if (p.y < 0) p.y = canvas.height;
+    if (p.y > canvas.height) p.y = 0;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+    ctx.fillStyle = color + Math.floor(p.a * 255).toString(16).padStart(2,'0');
+    ctx.fill();
+  });
+  requestAnimationFrame(drawParticles);
+}
+drawParticles();
+
+// ════════════════════════════════════════════════════════════════════
+// PAGE VISIBILITY
+// ════════════════════════════════════════════════════════════════════
+document.addEventListener('visibilitychange', () => {
+  G.isActive = !document.hidden;
+  if (G.isActive) {
+    G.lastTick = Date.now();
+    if (G.settings.music) AUDIO.playAmbient(G.currentWorld);
+  } else {
+    AUDIO.stopAll();
+  }
+});
+
+// ════════════════════════════════════════════════════════════════════
+// PWA SETUP
+// ════════════════════════════════════════════════════════════════════
+function setupPWA() {
+  const manifest = {
+    name: 'Clicker Worlds',
+    short_name: 'Clicker Worlds',
+    description: 'A relaxing clicker game with multiple unique worlds',
+    start_url: '.',
+    display: 'standalone',
+    background_color: '#04040f',
+    theme_color: '#7b3fe4',
+    icons: [
+      {
+        src: 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Ctext x=\'50\' y=\'70\' font-size=\'70\' text-anchor=\'middle\' fill=\'%23e8b84b\'%3E🌍%3C/text%3E%3C/svg%3E',
+        sizes: '192x192',
+        type: 'image/svg+xml'
+      },
+      {
+        src: 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Ctext x=\'50\' y=\'70\' font-size=\'70\' text-anchor=\'middle\' fill=\'%23e8b84b\'%3E🌍%3C/text%3E%3C/svg%3E',
+        sizes: '512x512',
+        type: 'image/svg+xml'
+      }
+    ]
+  };
+  const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+  const manifestURL = URL.createObjectURL(manifestBlob);
+  document.getElementById('manifestLink').href = manifestURL;
+
+  if ('serviceWorker' in navigator) {
+    const swCode = `
+      self.addEventListener('install', e => e.waitUntil(self.skipWaiting()));
+      self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
+      self.addEventListener('fetch', e => e.respondWith(caches.match(e.request).then(res => res || fetch(e.request))));
+    `;
+    const swBlob = new Blob([swCode], { type: 'application/javascript' });
+    const swURL = URL.createObjectURL(swBlob);
+    navigator.serviceWorker.register(swURL).then(reg => console.log('SW registered')).catch(console.error);
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════════════════
+function init() {
+  generateUpgrades();
+  loadGame();
+  switchWorld(G.currentWorld);
+  renderWorldsList();
+  renderUpgrades();
+  updateUI();
+  updateTrophyCount();
+  checkPrestigeButton();
+  tick();
+  setInterval(saveGame, 10000);
+  setInterval(renderUpgrades, 3000);
+
+  document.addEventListener('click', function initAudio() {
+    AUDIO.init();
+    if (G.settings.music) AUDIO.playAmbient(G.currentWorld);
+    document.removeEventListener('click', initAudio);
+  }, { once: true });
+
+  document.addEventListener('touchstart', function initAudioTouch() {
+    AUDIO.init();
+    if (G.settings.music) AUDIO.playAmbient(G.currentWorld);
+    document.removeEventListener('touchstart', initAudioTouch);
+  }, { once: true });
+
+  setupPWA();
+  toast('✨ ' + (currentLang === 'ar' ? 'مرحباً في عوالم النقر!' : 'Welcome to Clicker Worlds!'));
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
